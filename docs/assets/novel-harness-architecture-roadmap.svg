@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1180" viewBox="0 0 1680 1180" role="img" aria-labelledby="title desc">
+  <title id="title">novel-harness 架构与未来规划脑图</title>
+  <desc id="desc">展示 novel-harness 当前入口、Agent 创作管线、知识与工具层、MCP 知识包链路，以及未来升级路线。</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8faf7; }
+      .title { font: 800 42px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #17201b; }
+      .subtitle { font: 400 20px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #5a665f; }
+      .section-title { font: 800 25px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #17201b; }
+      .card-title { font: 800 21px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #17201b; }
+      .body { font: 400 17px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #344039; }
+      .small { font: 400 15px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #536158; }
+      .tag { font: 700 14px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #ffffff; }
+      .stage { font: 800 18px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #17201b; }
+      .muted { fill: #6d786f; }
+      .card { fill: #ffffff; stroke: #d9e2dc; stroke-width: 2; rx: 12; }
+      .card-green { fill: #f0f7ef; stroke: #a8cfa7; stroke-width: 2; rx: 12; }
+      .card-blue { fill: #eef6fb; stroke: #9dc6df; stroke-width: 2; rx: 12; }
+      .card-amber { fill: #fff7e8; stroke: #e6c06f; stroke-width: 2; rx: 12; }
+      .card-red { fill: #fff2ef; stroke: #e5aaa0; stroke-width: 2; rx: 12; }
+      .card-slate { fill: #f3f5f4; stroke: #c7d0ca; stroke-width: 2; rx: 12; }
+      .lane { fill: #ffffff; stroke: #dce5df; stroke-width: 2; rx: 18; }
+      .shadow { filter: drop-shadow(0 10px 18px rgba(31, 45, 36, 0.08)); }
+      .arrow { stroke: #6f8f7a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .arrow-blue { stroke: #4d89ad; stroke-width: 3; fill: none; marker-end: url(#arrow-blue); }
+      .arrow-amber { stroke: #b78324; stroke-width: 3; fill: none; marker-end: url(#arrow-amber); }
+      .dash { stroke-dasharray: 8 7; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6f8f7a"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4d89ad"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b78324"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1680" height="1180"/>
+
+  <text x="70" y="76" class="title">novel-harness 架构设计与未来规划</text>
+  <text x="72" y="112" class="subtitle">把 AI 变成小说创作团队：入口收束、Agent 分工、RAG 检索、MCP 知识包扩展、未来工具化闭环。</text>
+
+  <rect x="70" y="150" width="1540" height="410" class="lane shadow"/>
+  <text x="100" y="192" class="section-title">当前已落地的创作系统</text>
+
+  <rect x="105" y="225" width="250" height="220" class="card-green shadow"/>
+  <text x="130" y="263" class="card-title">用户入口</text>
+  <text x="130" y="300" class="body">/novel-core</text>
+  <text x="130" y="328" class="small">写小说 / 规划 / 审稿</text>
+  <text x="130" y="354" class="small">去 AI 味 / 续写章节</text>
+  <rect x="130" y="380" width="142" height="30" rx="15" fill="#4f8f61"/>
+  <text x="150" y="401" class="tag">统一触发入口</text>
+
+  <path d="M355 335 C388 335 392 335 425 335" class="arrow"/>
+
+  <rect x="425" y="210" width="340" height="250" class="card-blue shadow"/>
+  <text x="452" y="248" class="card-title">L1 总编 Agent</text>
+  <text x="452" y="286" class="body">理解需求，判断任务类型</text>
+  <text x="452" y="314" class="body">分派上下文 / 规划 / 写作 / 审稿</text>
+  <text x="452" y="342" class="body">管理质量门禁与用户确认</text>
+  <text x="452" y="382" class="small">核心文件：.harness/agents/总编Agent.md</text>
+  <rect x="452" y="405" width="154" height="30" rx="15" fill="#3f82a8"/>
+  <text x="474" y="426" class="tag">调度与判断</text>
+
+  <path d="M765 335 C804 335 812 335 850 335" class="arrow-blue"/>
+
+  <rect x="850" y="190" width="560" height="290" class="card shadow"/>
+  <text x="880" y="230" class="card-title">L2 专业 Agent 团队</text>
+
+  <rect x="880" y="260" width="230" height="74" class="card-slate"/>
+  <text x="900" y="288" class="stage">上下文 Agent</text>
+  <text x="900" y="314" class="small">状态、伏笔、章节记忆、上下文包</text>
+
+  <rect x="1140" y="260" width="230" height="74" class="card-slate"/>
+  <text x="1160" y="288" class="stage">规划 Agent</text>
+  <text x="1160" y="314" class="small">开书方向、大纲、黄金三章</text>
+
+  <rect x="880" y="360" width="230" height="74" class="card-slate"/>
+  <text x="900" y="388" class="stage">写作 Agent</text>
+  <text x="900" y="414" class="small">按大纲和上下文生成正文</text>
+
+  <rect x="1140" y="360" width="230" height="74" class="card-slate"/>
+  <text x="1160" y="388" class="stage">审稿 Agent</text>
+  <text x="1160" y="414" class="small">逻辑、节奏、设定、AI 味检查</text>
+
+  <path d="M1130 480 C1130 510 1130 520 1130 552" class="arrow"/>
+
+  <rect x="105" y="520" width="665" height="1" fill="#dce5df"/>
+
+  <rect x="70" y="610" width="1540" height="338" class="lane shadow"/>
+  <text x="100" y="652" class="section-title">知识与工具层：让 Agent 不再只靠提示词硬想</text>
+
+  <rect x="105" y="690" width="310" height="210" class="card-green shadow"/>
+  <text x="132" y="728" class="card-title">.harness/knowledge</text>
+  <text x="132" y="764" class="body">included：随项目自带基础包</text>
+  <text x="132" y="792" class="body">remote：MCP 下载云端包</text>
+  <text x="132" y="820" class="body">user：用户私有知识包</text>
+  <text x="132" y="858" class="small">去 AI 味 / 全民求生 / 网文写作基础</text>
+
+  <path d="M415 795 C454 795 470 795 508 795" class="arrow"/>
+
+  <rect x="508" y="690" width="310" height="210" class="card-blue shadow"/>
+  <text x="535" y="728" class="card-title">RAG 检索层</text>
+  <text x="535" y="764" class="body">索引知识包、规则、参考文档</text>
+  <text x="535" y="792" class="body">输出 Context Pack</text>
+  <text x="535" y="820" class="body">支持 humanization / planning 等任务路由</text>
+  <text x="535" y="858" class="small">当前：轻量混合检索，可本地重建</text>
+
+  <path d="M818 795 C858 795 874 795 912 795" class="arrow-blue"/>
+
+  <rect x="912" y="690" width="310" height="210" class="card-amber shadow"/>
+  <text x="939" y="728" class="card-title">本地 MCP</text>
+  <text x="939" y="764" class="body">list / install / update / remove</text>
+  <text x="939" y="792" class="body">rebuild_rag_index</text>
+  <text x="939" y="820" class="body">只写本机 remote 目录</text>
+  <text x="939" y="858" class="small">入口：rag/mcp/knowledge_server.py</text>
+
+  <path d="M1222 795 C1262 795 1278 795 1316 795" class="arrow-amber"/>
+
+  <rect x="1316" y="690" width="250" height="210" class="card-red shadow"/>
+  <text x="1343" y="728" class="card-title">服务器 / OSS</text>
+  <text x="1343" y="764" class="body">manifest API</text>
+  <text x="1343" y="792" class="body">知识包 zip 下载</text>
+  <text x="1343" y="820" class="body">当前只开放下载</text>
+  <text x="1343" y="858" class="small">未来：上传、审核、发布</text>
+
+  <path d="M1070 690 C1070 620 725 620 725 480" class="arrow-blue dash"/>
+  <text x="815" y="606" class="small">Agent 需要资料时：RAG 查询；缺包时建议 MCP 安装</text>
+
+  <rect x="70" y="990" width="1540" height="116" class="lane shadow"/>
+  <text x="100" y="1030" class="section-title">未来路线图</text>
+
+  <rect x="278" y="1048" width="190" height="44" rx="22" fill="#dff0df" stroke="#9cc99d" stroke-width="2"/>
+  <text x="312" y="1077" class="stage">A. MCP 收尾</text>
+  <path d="M468 1070 L532 1070" class="arrow"/>
+
+  <rect x="532" y="1048" width="210" height="44" rx="22" fill="#e7f3fb" stroke="#9dc6df" stroke-width="2"/>
+  <text x="559" y="1077" class="stage">B. RAG 过滤增强</text>
+  <path d="M742 1070 L806 1070" class="arrow-blue"/>
+
+  <rect x="806" y="1048" width="230" height="44" rx="22" fill="#fff3dc" stroke="#e6c06f" stroke-width="2"/>
+  <text x="831" y="1077" class="stage">C. Agent 工具化</text>
+  <path d="M1036 1070 L1100 1070" class="arrow-amber"/>
+
+  <rect x="1100" y="1048" width="230" height="44" rx="22" fill="#fff0ed" stroke="#e5aaa0" stroke-width="2"/>
+  <text x="1120" y="1077" class="stage">D. 上传与审核发布</text>
+  <path d="M1330 1070 L1394 1070" class="arrow"/>
+
+  <rect x="1394" y="1048" width="190" height="44" rx="22" fill="#f0f3f1" stroke="#c7d0ca" stroke-width="2"/>
+  <text x="1418" y="1077" class="stage">E. Trace 与恢复</text>
+
+  <text x="100" y="1144" class="small">当前定位：角色型 Agent 工作流已成型；下一步是把 RAG、MCP、扫描脚本、状态更新变成可调用、可记录、可恢复的工具闭环。</text>
+</svg>

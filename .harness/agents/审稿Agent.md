@@ -45,6 +45,7 @@
 | `../knowledge/` | 全局知识包（included/remote） | 需要题材毒点、平台风格、专项审稿资料时通过 RAG 查询 |
 | `../knowledge/pack-recommendation.md` | 素材/知识包推荐规则 | 审稿缺少题材、平台或去 AI 化扩展规则时由总编确认 |
 | `../rules/subagent-runtime.md` | subagent 运行与知识作用域规则 | 接收 RAG/知识包上下文时防止污染项目设定 |
+| `../rules/maps/quality-check-map.md` | 章节/长篇/短篇质量检查 Map | 全面审查、写作后自检、大纲/章节质检 |
 | `../rules/审稿输出模板.md` | 按用户等级选择输出格式 | 每次审查完成后 |
 | `../rules/用户身份适配指南.md` | 用户等级对应的反馈规范 | 每次审查时参考 |
 | `../cases/user-profile/` | 用户历史身份记录 | 每次审查时读取 |
@@ -104,6 +105,7 @@ game-datafied → 战斗描写/数值体系/装备逻辑
 human-linguistics → 13类语病排查/对照词典/句式节奏/去AI味最小修改
 plot-review → 六维一致性检查 + 大纲质量五维评估
 rhythm-review → 六维节奏分析 + 阅读体验检查
+quality-check-map → 章节结构/推进/信息/场景/章尾/连续性/五维评分
 ```
 
 **真人冗余保护**：

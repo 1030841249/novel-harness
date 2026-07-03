@@ -42,6 +42,28 @@
 | 大纲质量 | `.harness/skills/plot-review/rules/大纲质量评估清单.md` |
 | 阅读体验 | `.harness/skills/rhythm-review/references/阅读体验与章节润色检查.md` |
 | 写前准备 | `.harness/skills/plot-ideation/references/章节写前准备清单.md` |
+| 正文落盘门禁 | `.harness/rules/maps/draft-output-map.md` |
+| 章节期待链 | `.harness/rules/maps/planning-continuity-map.md` |
+| 场景三维度织入 | `.harness/rules/maps/writing-execution-map.md` |
+| 对话权力与议程 | `.harness/rules/maps/writing-execution-map.md` |
+| 最小记忆包 | `.harness/rules/maps/state-tracking-map.md` |
+| 章节质量检查 | `.harness/rules/maps/quality-check-map.md` |
+| 状态追踪协议 | `.harness/rules/maps/state-tracking-map.md` |
+| 人物视角边界 | `.harness/rules/maps/perspective-boundary-map.md` |
+| 叙事视角配置 | `.harness/rules/maps/perspective-boundary-map.md` |
+
+---
+
+## 规则 Map
+
+| Map | 作用 | 主要使用者 |
+|:----|:-----|:-----------|
+| `.harness/rules/maps/planning-continuity-map.md` | 三层期待、小纲四步法、线索热度、章尾钩子 | 规划 Agent |
+| `.harness/rules/maps/writing-execution-map.md` | 场景三维度织入、对话议程、小节偏短诊断、段落句子控制 | 写作 Agent |
+| `.harness/rules/maps/state-tracking-map.md` | 最小记忆包、状态快照、伏笔、线索热度 | 上下文 Agent |
+| `.harness/rules/maps/quality-check-map.md` | 通用质量门禁、长篇/短篇专项、五维评分 | 审稿 Agent / 写作 Agent |
+| `.harness/rules/maps/perspective-boundary-map.md` | 人物视角、叙事视角、角色/NPC 信息边界 | 规划 Agent / 写作 Agent |
+| `.harness/rules/maps/draft-output-map.md` | 正文落盘、项目骨架初始化、正文文件定位、写作恢复 | 总编 Agent / 写作 Agent / 上下文 Agent |
 
 ---
 
@@ -81,4 +103,5 @@
 |:-----|:-----|:---------|
 | `.harness/current-project.md` | 当前项目指针 | 每次启动 Step -1 时读取 |
 | `.harness/project-templates/模板-数据化降临.md` | 数据化降临题材创作约束 | 项目设置为该题材时加载 |
+| `.harness/project-templates/模板-游戏入侵现实-版本更新预告.md` | 游戏入侵现实、版本更新预告、灰度异常题材创作约束 | 项目设置为该题材时加载 |
 | `.harness/project-templates/模板-末世小黑屋.md` | 末世小黑屋题材创作约束 | 项目设置为该题材时加载 |
