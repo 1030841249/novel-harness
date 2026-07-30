@@ -11,7 +11,7 @@
 |:------|:-----|:---------|
 | 上下文 Agent | 状态追踪、伏笔管理、上下文打包、信息中枢 | `.harness/agents/上下文Agent.md` |
 | 规划 Agent | 剧情构思、设定扩展、反转/钩子设计 | `.harness/agents/规划Agent.md` |
-| 写作 Agent | 基于大纲、约束和上下文包生成正文 | `.harness/agents/写作Agent.md` |
+| 写作 Agent | 基于大纲、约束和上下文包提供分块写作指引；明确要求时生成正文 | `.harness/agents/写作Agent.md` |
 | 审稿 Agent | 调用各审查子模块，执行全面或专项审查 | `.harness/agents/审稿Agent.md` |
 
 ---
@@ -43,6 +43,7 @@
 | 阅读体验 | `.harness/skills/rhythm-review/references/阅读体验与章节润色检查.md` |
 | 写前准备 | `.harness/skills/plot-ideation/references/章节写前准备清单.md` |
 | 正文落盘门禁 | `.harness/rules/maps/draft-output-map.md` |
+| 分块写作指引 | `.harness/rules/maps/author-guidance-map.md` |
 | 章节期待链 | `.harness/rules/maps/planning-continuity-map.md` |
 | 场景三维度织入 | `.harness/rules/maps/writing-execution-map.md` |
 | 对话权力与议程 | `.harness/rules/maps/writing-execution-map.md` |
@@ -60,6 +61,8 @@
 |:----|:-----|:-----------|
 | `.harness/rules/maps/planning-continuity-map.md` | 三层期待、小纲四步法、线索热度、章尾钩子 | 规划 Agent |
 | `.harness/rules/maps/writing-execution-map.md` | 场景三维度织入、对话议程、小节偏短诊断、段落句子控制 | 写作 Agent |
+| `.harness/rules/maps/author-guidance-map.md` | 分块写作指引、局部卡点拆解、用户手填脚手架 | 写作 Agent |
+| `.harness/rules/maps/coaching-mode-map.md` | 灵感引导、分块陪写、正文粗稿和审稿诊断的输出边界 | 总编 / 规划 / 写作 / 审稿 Agent |
 | `.harness/rules/maps/state-tracking-map.md` | 最小记忆包、状态快照、伏笔、线索热度 | 上下文 Agent |
 | `.harness/rules/maps/quality-check-map.md` | 通用质量门禁、长篇/短篇专项、五维评分 | 审稿 Agent / 写作 Agent |
 | `.harness/rules/maps/perspective-boundary-map.md` | 人物视角、叙事视角、角色/NPC 信息边界 | 规划 Agent / 写作 Agent |

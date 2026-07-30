@@ -7,6 +7,10 @@ description: 当用户使用 /novel-core，或请求写长篇网文、开书、�
 
 这是 `novel-harness` 小说创作工程的 thin skill 入口。
 
+## 核心产品原则
+
+这是面向老书虫转作者和已有作者的 AI 小说创作陪练，不是一键成书工具。启动后必须读取 `.harness/rules/maps/coaching-mode-map.md`，默认帮助用户激发思路和拆分写作块；只有明确要求时生成完整正文，并标记为待人工精修粗稿。
+
 ## 触发方式
 
 用户出现以下任一请求时使用本 skill：
@@ -25,26 +29,27 @@ description: 当用户使用 /novel-core，或请求写长篇网文、开书、�
    - 如果当前目录不是 novel-harness，询问用户提供仓库路径。
    - 判断依据：根目录存在 `.harness/agents/总编Agent.md`、`.harness/agents/`、`.harness/skills/`。
 2. 读取 `.harness/agents/总编Agent.md`，作为 L1 总编 Agent。
-3. 读取 `.harness/current-project.md`，确认当前小说项目。
-4. 如果当前项目仍是模板占位，先询问：
+3. 读取 `.harness/rules/maps/coaching-mode-map.md`，判断本轮输出模式。
+4. 读取 `.harness/current-project.md`，确认当前小说项目。
+5. 如果当前项目仍是模板占位，先询问：
    - 书名或项目名
    - 题材
    - 目标平台（不确定时让用户选：番茄新手向 / 起点长线向 / 先不限定）
    - 主角
    - 一句话世界观或开局设定
-5. 根据任务类型按需读取对应 Agent：
+6. 根据任务类型按需读取对应 Agent：
    - 规划/大纲/剧情方向：`.harness/agents/规划Agent.md`
    - 写正文/续写章节：`.harness/agents/写作Agent.md`
    - 审稿/去 AI 味/查问题：`.harness/agents/审稿Agent.md`
    - 长篇状态、伏笔、设定延续：`.harness/agents/上下文Agent.md`
-6. 需要语感、人性化、去 AI 味时，按需读取：
+7. 需要语感、人性化、去 AI 味时，按需读取：
    - `.harness/skills/human-linguistics/SKILL.md`
    - `.harness/skills/human-linguistics/rules/去AI味最小修改指南.md`
    - `.harness/skills/human-linguistics/rules/语病诊断手册.md`
    - `.harness/knowledge/` 中已安装的题材、写作、去 AI 化知识包。
    - `.harness/skills/human-linguistics/references/` 下的题材参考。
-7. 如果缺少对应题材、平台风格或专项审稿知识包，提示用户可通过 MCP/知识包同步工具安装扩展知识包，并重建 RAG 索引后继续。
-8. 明确写正文或续写时，按 `.harness/rules/maps/draft-output-map.md` 处理项目骨架、正文文件和恢复流程。
+8. 如果缺少对应题材、平台风格或专项审稿知识包，提示用户可通过 MCP/知识包同步工具安装扩展知识包，并重建 RAG 索引后继续。
+9. 明确写正文或续写时，按 `.harness/rules/maps/draft-output-map.md` 处理项目骨架、正文文件和恢复流程。
 
 ## 默认行为
 
@@ -56,8 +61,8 @@ description: 当用户使用 /novel-core，或请求写长篇网文、开书、�
 2. 没有项目时，引导创建项目档案。
 3. 如果用户不知道写什么、已有项目未记录目标平台，或没有明确目标平台，先做平台素材推荐：新手优先番茄热门方向，再补起点长线结构对照；不要默认只搜索起点。
 4. 有项目但缺少大纲时，先输出 2-3 个开局方向。
-5. 用户确认方向后，再写正文。
-6. 正文生成后，默认做一次轻量审稿。
+5. 用户确认方向后，默认调用写作 Agent 输出分块写作指引，而不是直接代写完整正文。
+6. 只有用户明确要求“直接写完整初稿/生成正文/写入正文文件/落盘”时，才进入完整正文生成；交付物标记为“待人工精修粗稿”，并默认做一次轻量审稿。
 
 进入背景设定、大纲、章纲或正文前，必须确认 `projects/{项目名}/` 已初始化；只有 `.harness/current-project.md` 指针不够。骨架缺失时按 `.harness/rules/maps/draft-output-map.md` 处理：明确写正文就初始化本地骨架并恢复写作；只输出方案或不落盘时不创建文件。
 
@@ -65,7 +70,7 @@ description: 当用户使用 /novel-core，或请求写长篇网文、开书、�
 
 用户完善、参考或修改具体设定/大纲时，先做关键词检测；命中设定、世界观、金手指、体系、大纲、卷纲、章纲、黄金三章、主线、伏笔等对象，并同时命中修改、调整、完善、参考、查询、扩展、细化等动作时，必须先用 subagent 隔离上下文。
 
-写正文、章纲或细纲前必须确认目标字数：约 2000、约 2500、约 3000+，或用户指定字数。目标字数会影响情节点数量、场景数量和章尾钩子设计。
+写作 Agent 默认给“空瓶式”分块写作指引：按篇幅拆出足量小块，例如 2500 字约 10-12 瓶；每瓶只写简短发展方向、可用动作/物体/情绪、衔接方式和避坑，交给用户自己填正文。完整正文生成前必须确认目标字数：约 2000、约 2500、约 3000+，或用户指定字数。
 
 开书推荐必须保持流程进度：
 
