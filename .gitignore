@@ -18,6 +18,10 @@ rag/data/
 
 # 避免 node_modules 被误提交
 rag/node_modules/
+studio/frontend/node_modules/
+studio/frontend/dist/
+studio/frontend/.artifacts/
+studio/frontend/test-results/
 
 # Python 缓存
 __pycache__/

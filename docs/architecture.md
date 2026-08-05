@@ -81,6 +81,8 @@ subagent 运行时规则见 `.harness/rules/subagent-runtime.md`。总编 Agent 
 - `skills/novel-core/SKILL.md`：Codex Skill 安装入口，负责触发 `/novel-core` 并路由到总编 Agent。
 - `.harness/agents/总编Agent.md`：Agent 核心入口，由总编 Agent 识别需求、分派上下文/规划/写作/审稿任务。
 - `.harness/skills/`：Harness 内部能力模块，只由 Agent 或工作流按需调用。
+- `studio/`：本地可视化应用，读取 `projects/` 并提供安全的 Markdown 管理与编辑界面。
+- `rag/`：知识检索服务，不承载项目文件编辑 API。
 - `legacy-skills/`：旧版导入 skill 资产，不作为当前主入口。其中有价值的资料后续逐步迁移到 Harness 模块或 RAG 参考库。
 
 这种收束是一次架构升级：用户不需要在大量 skill 中猜该调用哪一个，只需要描述目标，由总编 Agent 负责判断该走哪条流程、加载哪些模块和参考资料。
@@ -127,6 +129,12 @@ novel-harness/
 │   ├── config/                       ← 知识源/路由配置
 │   ├── test/                         ← 验收测试
 │   └── OPERATIONS.md                 ← 操作手册
+│
+├── studio/                           ← 本地可视化创作工作台
+│   ├── backend/                      ← 项目扫描与安全文件 API
+│   ├── frontend/                     ← Dashboard 与 Markdown 编辑器
+│   ├── run.py                        ← 单命令启动入口
+│   └── README.md                     ← Studio 使用说明
 │
 ├── docs/                             ← 详细文档
 │   ├── architecture.md               ← 本文

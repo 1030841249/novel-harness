@@ -66,7 +66,19 @@ AI 帮你激发灵感、拆解章节、提供写作支架、检查问题和管�
 
 ---
 
-## 3. RAG 参考检索
+## 3. Studio 可视化工作台
+
+Studio 直接管理本地 `projects/` 中的小说、章节、大纲和设定，支持 Markdown 编辑、历史恢复、回收站、草稿保护和外部修改冲突检测。
+
+```powershell
+python studio/run.py
+```
+
+首次运行会自动准备前端并打开 `http://127.0.0.1:8765`。详细说明见：[Studio 使用说明](studio/README.md)
+
+---
+
+## 4. RAG 参考检索
 
 RAG 用来检索项目里的题材参考、去 AI 味规则、审稿规则和案例文档。参考资料越多，它越能帮 Agent 找到合适的拆书样本、题材规则和人性化写法。
 
@@ -92,7 +104,7 @@ python rag/scripts/build_index.py
 
 ---
 
-## 4. 知识包下载与本地 MCP
+## 5. 知识包下载与本地 MCP
 
 `novel-harness` 当前有一个测试版知识包下载链路，用来把服务器上的参考资料安装到本地 RAG。它不是完整的云平台，也不开放用户上传；现阶段只做“服务器列出可下载包，本地按需安装”。
 
@@ -132,7 +144,7 @@ rebuild_rag_index
 
 ---
 
-## 5. 专项文档
+## 6. 专项文档
 
 - [AI 创作陪练设计原则](docs/design-principles.md)
 - [系统架构](docs/architecture.md)
@@ -144,7 +156,7 @@ rebuild_rag_index
 
 ---
 
-## 6. 去 AI 化效果示例
+## 7. 去 AI 化效果示例
 
 `human-linguistics` 模块用于把偏工整、解释感重的 AI 文风，调整成更接近真人网文作者的叙述口气。
 
@@ -154,7 +166,7 @@ rebuild_rag_index
 
 ---
 
-## 7. 当前扩展能力
+## 8. 当前扩展能力
 
 ### 测试版知识包 MCP
 
