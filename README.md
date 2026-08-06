@@ -12,21 +12,27 @@ AI 帮你激发灵感、拆解章节、提供写作支架、检查问题和管�
 
 ---
 
-## 1. 安装
+## 1. 一句话安装
 
 把下面这句话发给 Codex、Claude Code、Cursor 或 OpenCode：
 
 ```text
-请阅读 docs/install.md，帮我安装 novel-core，并确认之后可以用 /novel-core 帮我写小说 触发。
+请阅读当前项目的 docs/install.md，帮我一键安装 novel-harness：安装 novel-core，准备并启动 Studio Dashboard，并验证 /novel-core 与 http://127.0.0.1:8765 都可以使用。
 ```
 
 安装文档：[docs/install.md](docs/install.md)
 
-安装后直接输入：
+安装完成后有两个入口：
 
 ```text
 /novel-core 帮我写小说
 ```
+
+```text
+http://127.0.0.1:8765
+```
+
+`/novel-core` 用于在 AI 工具中规划、陪写和审稿；Dashboard 用于管理小说、章节、大纲、设定和 Markdown 正文。
 
 ---
 
@@ -66,15 +72,39 @@ AI 帮你激发灵感、拆解章节、提供写作支架、检查问题和管�
 
 ---
 
-## 3. Studio 可视化工作台
+## 3. Studio Dashboard
 
-Studio 直接管理本地 `projects/` 中的小说、章节、大纲和设定，支持 Markdown 编辑、历史恢复、回收站、草稿保护、外部修改冲突检测，以及可在网页中配置模型的实时 AI 陪练对话。
+Studio Dashboard 直接管理本地 `projects/` 中的小说文件，不把正文上传到远端。首次运行会自动准备前端并打开浏览器：
 
 ```powershell
 python studio/run.py
 ```
 
-首次运行会自动准备前端并打开 `http://127.0.0.1:8765`。详细说明见：[Studio 使用说明](studio/README.md)
+### 查看创作进度
+
+首页集中展示小说项目、章节数、总字数、待精修项和最近编辑，可以直接新建小说或继续上次工作。
+
+![Studio Dashboard 创作工作台](docs/assets/studio-dashboard.png)
+
+### 管理项目与章节
+
+进入小说后，可以按正文、大纲、设定和状态分类管理 Markdown 文档，查看目标字数和创作准备情况。
+
+![Studio 小说项目与章节管理](docs/assets/studio-project.png)
+
+### 编辑正文并使用 AI 陪练
+
+点击章节进入 Markdown 编辑器，左侧切换项目文档，中间编辑与预览，右侧可以实时询问下一段方向、拆分写作块或检查章节问题。
+
+![Studio Markdown 编辑器与 AI 陪练](docs/assets/studio-editor.png)
+
+### 配置 AI 模型
+
+点击左下角 **AI 模型设置**，选择 DeepSeek、OpenAI、硅基流动、Ollama、LM Studio 或其他 OpenAI 兼容服务；读取模型后保存即可使用。
+
+![Studio AI 模型设置](docs/assets/studio-ai-settings.png)
+
+Studio 还支持历史恢复、回收站、浏览器草稿保护和外部修改冲突检测。详细说明见：[Studio 使用说明](studio/README.md)
 
 ---
 
