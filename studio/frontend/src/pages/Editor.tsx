@@ -2,27 +2,27 @@ import CodeMirror from "@uiw/react-codemirror";
 import { markdown } from "@codemirror/lang-markdown";
 import {
   ArrowLeft,
-  BookOpenCheck,
   Check,
   ChevronDown,
   ChevronRight,
-  Clock3,
   FileText,
-  Lightbulb,
   PanelRightClose,
   PanelRightOpen,
   RefreshCw,
   RotateCcw,
   Save,
+  Settings2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ApiError, api } from "../api";
+import { AISettingsDialog } from "../components/AISettingsDialog";
+import { CoachPanel } from "../components/CoachPanel";
 import { ErrorState, LoadingState } from "../components/Common";
 import { Link, useParams, useSearchParams } from "../router";
 import type { DocumentData, HistoryEntry, ProjectDetail } from "../types";
-import { formatDate, formatNumber } from "../utils";
+import { formatDate } from "../utils";
 
 type EditorMode = "edit" | "split" | "preview";
 
@@ -37,12 +37,14 @@ export function Editor() {
   const [mode, setMode] = useState<EditorMode>("split");
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState("");
-  const [rightOpen, setRightOpen] = useState(true);
+  const [rightOpen, setRightOpen] = useState(() => window.innerWidth > 1100);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ 正文: true, 大纲: true, 设定: true });
   const [todos, setTodos] = useState<string[]>([]);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [draft, setDraft] = useState<{ content: string; savedAt: string } | null>(null);
   const [externalChanged, setExternalChanged] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [chatConfigVersion, setChatConfigVersion] = useState(0);
 
   const loadDocument = (discardDraft = false) => {
     if (!path) return;
@@ -180,6 +182,7 @@ export function Editor() {
           <button className={mode === "split" ? "active" : ""} onClick={() => setMode("split")}>分栏</button>
           <button className={mode === "preview" ? "active" : ""} onClick={() => setMode("preview")}>预览</button>
         </div>
+        <button className="icon-button" title="AI 模型设置" onClick={() => setSettingsOpen(true)}><Settings2 size={18} /></button>
         <button className="icon-button" title={rightOpen ? "收起陪练栏" : "展开陪练栏"} onClick={() => setRightOpen((value) => !value)}>{rightOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}</button>
         <button className="button button-primary" onClick={save} disabled={!dirty || saving}><Save size={16} /> {saving ? "保存中" : "保存"}</button>
       </header>
@@ -206,26 +209,21 @@ export function Editor() {
         {mode !== "edit" && <article className="markdown-preview"><ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown></article>}
       </main>
 
-      <aside className="coach-panel">
-        <div className="coach-section">
-          <div className="coach-title"><BookOpenCheck size={17} /><strong>文档信息</strong></div>
-          <dl className="document-meta"><div><dt>类型</dt><dd>{document.path.split("/")[0]}</dd></div><div><dt>字数</dt><dd>{formatNumber(countWords(content))}</dd></div><div><dt>段落</dt><dd>{content.split(/\n\s*\n/).filter(Boolean).length}</dd></div><div><dt>修改</dt><dd>{formatDate(document.modified_at)}</dd></div></dl>
-        </div>
-        <div className="coach-section history-section">
-          <div className="coach-title"><Clock3 size={17} /><strong>历史版本</strong><span>{history.length}</span></div>
-          {history.length ? history.slice(0, 5).map((entry) => <div className="history-entry" key={entry.id}><div><strong>{formatDate(entry.created_at)}</strong><small>{formatNumber(entry.word_count)} 字 · {entry.preview || "空文档"}</small></div><button title="恢复此版本" onClick={() => restoreVersion(entry)}><RotateCcw size={14} /></button></div>) : <p className="coach-empty">首次保存修改后会自动保留历史</p>}
-        </div>
-        <div className="coach-section coach-suggestions">
-          <div className="coach-title"><Lightbulb size={17} /><strong>陪练建议</strong><span>不改正文</span></div>
-          {suggestions.map((suggestion) => (
-            <div className="suggestion" key={suggestion.title}>
-              <strong>{suggestion.title}</strong><p>{suggestion.body}</p>
-              <button disabled={todos.includes(suggestion.title)} onClick={() => setTodos((current) => [...current, suggestion.title])}>{todos.includes(suggestion.title) ? <><Check size={13} /> 已加入待办</> : "采纳为待办"}</button>
-            </div>
-          ))}
-        </div>
-        {todos.length > 0 && <div className="coach-section todo-section"><div className="coach-title"><Check size={17} /><strong>本次精修待办</strong></div>{todos.map((todo) => <label key={todo}><input type="checkbox" /> <span>{todo}</span></label>)}</div>}
-      </aside>
+      <CoachPanel
+        project={project}
+        document={document}
+        content={content}
+        history={history}
+        suggestions={suggestions}
+        todos={todos}
+        onAddTodo={(title) => setTodos((current) => [...current, title])}
+        onRestoreVersion={(entry) => void restoreVersion(entry)}
+        wordCount={countWords(content)}
+        paragraphCount={content.split(/\n\s*\n/).filter(Boolean).length}
+        configVersion={chatConfigVersion}
+        onConfigure={() => setSettingsOpen(true)}
+      />
+      {settingsOpen && <AISettingsDialog onClose={() => setSettingsOpen(false)} onSaved={() => setChatConfigVersion((version) => version + 1)} />}
     </div>
   );
 }

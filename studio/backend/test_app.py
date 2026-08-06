@@ -1,10 +1,50 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+import httpx
 from fastapi.testclient import TestClient
 
 from studio.backend.app import ProjectStore, _word_count, create_app
+from studio.backend.chat import DisabledChatProvider, _connection_error_message, _provider_http_error
+
+
+class FakeChatProvider:
+    def __init__(self):
+        self.calls = []
+
+    @property
+    def status(self):
+        return {"enabled": True, "provider": "测试模型", "model": "fake-model", "message": ""}
+
+    async def stream(self, messages):
+        self.calls.append(messages)
+        yield "先写人物的迟疑，"
+        yield "再决定下一步。"
+
+
+class FakeModelResponse:
+    status_code = 200
+
+    @staticmethod
+    def json():
+        return {"data": [{"id": "model-b"}, {"id": "model-a"}, {"id": "model-a"}]}
+
+
+class FakeModelClient:
+    def __init__(self, *args, **kwargs):
+        self.headers = None
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, traceback):
+        return False
+
+    async def get(self, url, headers):
+        self.headers = headers
+        return FakeModelResponse()
 
 
 class StudioBackendTest(unittest.TestCase):
@@ -19,7 +59,8 @@ class StudioBackendTest(unittest.TestCase):
         short = self.projects / "测试短篇"
         short.mkdir(parents=True)
         (short / "正文.md").write_text("# 短篇\n\n一段内容。\n", encoding="utf-8")
-        self.client = TestClient(create_app(self.projects))
+        self.chat_provider = FakeChatProvider()
+        self.client = TestClient(create_app(self.projects, self.chat_provider))
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -171,6 +212,108 @@ class StudioBackendTest(unittest.TestCase):
         store = ProjectStore(self.projects)
         with self.assertRaises(Exception):
             store.project_summary("测试长篇/正文")
+
+    def test_chat_streams_and_persists_project_context(self):
+        created = self.client.post(
+            "/api/chat/sessions",
+            json={"project": "测试长篇", "path": "正文/第001章.md"},
+        )
+        self.assertEqual(created.status_code, 201)
+        session_id = created.json()["id"]
+        response = self.client.post(
+            f"/api/chat/sessions/{session_id}/messages",
+            json={"project": "测试长篇", "message": "下一段怎么写？", "draft_content": "# 第一章\n\n尚未保存的正文。"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("先写人物的迟疑", response.text)
+        session = self.client.get(f"/api/chat/sessions/{session_id}", params={"project": "测试长篇"}).json()
+        self.assertEqual([item["role"] for item in session["messages"]], ["user", "assistant"])
+        self.assertIn("再决定下一步", session["messages"][1]["content"])
+        prompt = self.chat_provider.calls[0][0]["content"]
+        self.assertIn("尚未保存的正文", prompt)
+        self.assertIn("开局", prompt)
+
+    def test_chat_rejects_invalid_document_and_session_id(self):
+        invalid_document = self.client.post(
+            "/api/chat/sessions",
+            json={"project": "测试长篇", "path": "../秘密.md"},
+        )
+        self.assertEqual(invalid_document.status_code, 400)
+        invalid_session = self.client.get("/api/chat/sessions/not-valid", params={"project": "测试长篇"})
+        self.assertEqual(invalid_session.status_code, 400)
+
+    def test_chat_reports_missing_provider_configuration(self):
+        client = TestClient(create_app(self.projects, DisabledChatProvider()))
+        status_response = client.get("/api/chat/status")
+        self.assertEqual(status_response.status_code, 200)
+        self.assertFalse(status_response.json()["enabled"])
+        session = client.post(
+            "/api/chat/sessions",
+            json={"project": "测试长篇", "path": "正文/第001章.md"},
+        ).json()
+        response = client.post(
+            f"/api/chat/sessions/{session['id']}/messages",
+            json={"project": "测试长篇", "message": "继续"},
+        )
+        self.assertEqual(response.status_code, 503)
+
+    def test_ai_config_is_persisted_without_exposing_api_key(self):
+        config_path = Path(self.temp_dir.name) / "private" / "studio-ai.json"
+        client = TestClient(create_app(self.projects, ai_config_path=config_path))
+        self.assertFalse(client.get("/api/chat/status").json()["enabled"])
+
+        saved = client.put(
+            "/api/chat/config",
+            json={
+                "preset": "openai",
+                "base_url": "https://example.com/v1/",
+                "model": "example-model",
+                "api_key": "secret-token",
+                "timeout_seconds": 90,
+            },
+        )
+        self.assertEqual(saved.status_code, 200)
+        self.assertEqual(saved.json()["model"], "example-model")
+        self.assertTrue(saved.json()["enabled"])
+        public = client.get("/api/chat/config").json()
+        self.assertTrue(public["api_key_set"])
+        self.assertNotIn("secret-token", str(public))
+        self.assertEqual(public["source"], "local")
+
+        updated = client.put(
+            "/api/chat/config",
+            json={
+                "preset": "openai",
+                "base_url": "https://example.com/v1",
+                "model": "second-model",
+                "timeout_seconds": 90,
+            },
+        )
+        self.assertEqual(updated.json()["model"], "second-model")
+        self.assertIn("secret-token", config_path.read_text(encoding="utf-8"))
+
+        cleared = client.delete("/api/chat/config")
+        self.assertFalse(cleared.json()["enabled"])
+        self.assertFalse(config_path.exists())
+
+    def test_ai_model_discovery_normalizes_model_ids(self):
+        config_path = Path(self.temp_dir.name) / "private" / "studio-ai.json"
+        client = TestClient(create_app(self.projects, ai_config_path=config_path))
+        with patch("studio.backend.chat.httpx.AsyncClient", FakeModelClient):
+            response = client.post(
+                "/api/chat/models",
+                json={"base_url": "http://127.0.0.1:11434/v1", "api_key": "temporary-key"},
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["models"], ["model-a", "model-b"])
+        self.assertEqual(client.post("/api/chat/models", json={"base_url": "file:///tmp/models"}).status_code, 400)
+
+    def test_ai_connection_errors_are_actionable(self):
+        local_error = httpx.ConnectError("connection refused")
+        self.assertIn("本地模型服务未启动", _connection_error_message("http://127.0.0.1:11434/v1", local_error))
+        self.assertIn("API Key", _provider_http_error(401, "models"))
+        self.assertIn("手动填写模型 ID", _provider_http_error(404, "models"))
+        self.assertIn("不要包含 /chat/completions", _provider_http_error(404, "chat"))
 
 
 if __name__ == "__main__":

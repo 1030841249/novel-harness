@@ -68,7 +68,7 @@ AI 帮你激发灵感、拆解章节、提供写作支架、检查问题和管�
 
 ## 3. Studio 可视化工作台
 
-Studio 直接管理本地 `projects/` 中的小说、章节、大纲和设定，支持 Markdown 编辑、历史恢复、回收站、草稿保护和外部修改冲突检测。
+Studio 直接管理本地 `projects/` 中的小说、章节、大纲和设定，支持 Markdown 编辑、历史恢复、回收站、草稿保护、外部修改冲突检测，以及可在网页中配置模型的实时 AI 陪练对话。
 
 ```powershell
 python studio/run.py

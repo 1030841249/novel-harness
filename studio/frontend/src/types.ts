@@ -98,3 +98,61 @@ export interface ProjectInput {
   target_words: number;
   status?: string;
 }
+
+export interface ChatStatus {
+  enabled: boolean;
+  provider: string;
+  model: string;
+  message: string;
+  configurable?: boolean;
+  source?: "local" | "environment" | "none" | "injected";
+}
+
+export interface AIProviderPreset {
+  id: string;
+  label: string;
+  base_url: string;
+  requires_api_key: boolean;
+}
+
+export interface AIConfig {
+  preset: string;
+  base_url: string;
+  model: string;
+  api_key_set: boolean;
+  timeout_seconds: number;
+  source: "local" | "environment" | "none";
+  presets: AIProviderPreset[];
+}
+
+export interface AIConfigInput {
+  preset: string;
+  base_url: string;
+  model: string;
+  api_key?: string;
+  clear_api_key?: boolean;
+  timeout_seconds: number;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+export interface ChatSession {
+  id: string;
+  project: string;
+  path: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages: ChatMessage[];
+}
+
+export type ChatStreamEvent =
+  | { type: "start"; session_id: string }
+  | { type: "delta"; content: string }
+  | { type: "error"; message: string }
+  | { type: "done"; session: ChatSession };

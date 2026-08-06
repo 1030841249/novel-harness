@@ -21,6 +21,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from studio.backend.chat import ChatProvider, create_chat_router
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PROJECTS_ROOT = REPO_ROOT / "projects"
@@ -621,10 +623,11 @@ class ProjectStore:
         return {"path": request.path, "status": request.value}
 
 
-def create_app(projects_root: Path = DEFAULT_PROJECTS_ROOT) -> FastAPI:
+def create_app(projects_root: Path = DEFAULT_PROJECTS_ROOT, chat_provider: ChatProvider | None = None, ai_config_path: Path | None = None) -> FastAPI:
     store = ProjectStore(projects_root)
     application = FastAPI(title="novel-harness Studio", version="1.0.0")
     application.state.store = store
+    application.include_router(create_chat_router(store, chat_provider, ai_config_path))
     application.add_middleware(
         CORSMiddleware,
         allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],

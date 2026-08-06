@@ -5,12 +5,14 @@ import {
   LayoutDashboard,
   Menu,
   Search,
+  Settings2,
   X,
 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { Link, useLocation } from "../router";
 import type { SearchResult } from "../types";
+import { AISettingsDialog } from "./AISettingsDialog";
 
 interface ShellProps {
   children: ReactNode;
@@ -26,6 +28,7 @@ export function Shell({ children, title, subtitle, actions, fullWidth = false }:
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
 
@@ -88,6 +91,10 @@ export function Shell({ children, title, subtitle, actions, fullWidth = false }:
           </button>
         </nav>
         <div className="sidebar-bottom">
+          <button className="nav-settings" type="button" onClick={() => { setSettingsOpen(true); setMobileOpen(false); }}>
+            <Settings2 size={18} />
+            AI 模型设置
+          </button>
           <div className="local-status"><span /> 本地文件模式</div>
         </div>
       </aside>
@@ -128,6 +135,7 @@ export function Shell({ children, title, subtitle, actions, fullWidth = false }:
           </div>
         </div>
       )}
+      {settingsOpen && <AISettingsDialog onClose={() => setSettingsOpen(false)} />}
     </div>
   );
 }

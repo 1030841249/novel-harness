@@ -9,6 +9,9 @@ legacy-skills/
 # 当前小说项目指针，只保留在本地
 .harness/current-project.md
 
+# Studio 本地 AI 配置，可能包含模型服务密钥
+.harness/local/
+
 # 知识包运行时目录：远程包和用户私有包只保留在本地
 .harness/knowledge/remote/
 .harness/knowledge/user/

@@ -1,4 +1,4 @@
-import type { ChapterState, DashboardData, DocumentData, HistoryEntry, ProjectDetail, ProjectInput, SearchResult, TrashEntry } from "./types";
+import type { AIConfig, AIConfigInput, ChapterState, ChatSession, ChatStatus, ChatStreamEvent, DashboardData, DocumentData, HistoryEntry, ProjectDetail, ProjectInput, SearchResult, TrashEntry } from "./types";
 
 export class ApiError extends Error {
   status: number;
@@ -20,6 +20,34 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     throw new ApiError(response.status, detail || `请求失败 (${response.status})`);
   }
   return response.json() as Promise<T>;
+}
+
+async function streamingRequest(url: string, init: RequestInit, onEvent: (event: ChatStreamEvent) => void): Promise<void> {
+  const response = await fetch(url, {
+    ...init,
+    headers: { "Content-Type": "application/json", ...init.headers },
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({ detail: "请求失败" }));
+    throw new ApiError(response.status, typeof body.detail === "string" ? body.detail : `请求失败 (${response.status})`);
+  }
+  if (!response.body) throw new ApiError(502, "模型服务没有返回数据流");
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    buffer += decoder.decode(value, { stream: !done });
+    const frames = buffer.split(/\r?\n\r?\n/);
+    buffer = frames.pop() || "";
+    for (const frame of frames) {
+      const data = frame.split(/\r?\n/).find((line) => line.startsWith("data:"))?.slice(5).trim();
+      if (data) onEvent(JSON.parse(data) as ChatStreamEvent);
+    }
+    if (done) break;
+  }
+  const finalData = buffer.split(/\r?\n/).find((line) => line.startsWith("data:"))?.slice(5).trim();
+  if (finalData) onEvent(JSON.parse(finalData) as ChatStreamEvent);
 }
 
 export const api = {
@@ -72,4 +100,31 @@ export const api = {
       `/api/projects/${encodeURIComponent(project)}/document-status`,
       { method: "PATCH", body: JSON.stringify({ path, value }) },
     ),
+  chatStatus: () => request<ChatStatus>("/api/chat/status"),
+  aiConfig: () => request<AIConfig>("/api/chat/config"),
+  saveAIConfig: (input: AIConfigInput) => request<ChatStatus>("/api/chat/config", { method: "PUT", body: JSON.stringify(input) }),
+  clearAIConfig: () => request<ChatStatus>("/api/chat/config", { method: "DELETE" }),
+  discoverAIModels: (baseUrl: string, apiKey: string, timeoutSeconds: number) =>
+    request<{ models: string[] }>("/api/chat/models", {
+      method: "POST",
+      body: JSON.stringify({ base_url: baseUrl, api_key: apiKey || undefined, timeout_seconds: timeoutSeconds }),
+    }),
+  chatSessions: (project: string, path: string) =>
+    request<ChatSession[]>(`/api/chat/sessions?project=${encodeURIComponent(project)}&path=${encodeURIComponent(path)}`),
+  createChatSession: (project: string, path: string) =>
+    request<ChatSession>("/api/chat/sessions", { method: "POST", body: JSON.stringify({ project, path }) }),
+  chatSession: (project: string, sessionId: string) =>
+    request<ChatSession>(`/api/chat/sessions/${encodeURIComponent(sessionId)}?project=${encodeURIComponent(project)}`),
+  streamChatMessage: (
+    project: string,
+    sessionId: string,
+    message: string,
+    draftContent: string,
+    onEvent: (event: ChatStreamEvent) => void,
+    signal?: AbortSignal,
+  ) => streamingRequest(
+    `/api/chat/sessions/${encodeURIComponent(sessionId)}/messages`,
+    { method: "POST", body: JSON.stringify({ project, message, draft_content: draftContent }), signal },
+    onEvent,
+  ),
 };

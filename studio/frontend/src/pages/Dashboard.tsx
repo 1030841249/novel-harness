@@ -64,7 +64,7 @@ export function Dashboard() {
                     <stop offset="100%" stopColor="#267a57" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="date" tickFormatter={(value) => value.slice(5)} axisLine={false} tickLine={false} tick={{ fill: "#798079", fontSize: 11 }} />
+                <XAxis dataKey="date" tickFormatter={(value) => value.slice(5)} axisLine={false} tickLine={false} tick={{ fill: "#798079", fontSize: 12 }} />
                 <Tooltip formatter={(value) => [`${formatNumber(Number(value))} 字`, "活跃文档"]} labelFormatter={(value) => String(value)} />
                 <Area type="monotone" dataKey="words" stroke="#267a57" strokeWidth={2} fill="url(#activityFill)" />
               </AreaChart>

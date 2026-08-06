@@ -131,7 +131,7 @@ novel-harness/
 │   └── OPERATIONS.md                 ← 操作手册
 │
 ├── studio/                           ← 本地可视化创作工作台
-│   ├── backend/                      ← 项目扫描与安全文件 API
+│   ├── backend/                      ← 项目扫描、安全文件 API 与本地 AI 网关
 │   ├── frontend/                     ← Dashboard 与 Markdown 编辑器
 │   ├── run.py                        ← 单命令启动入口
 │   └── README.md                     ← Studio 使用说明
